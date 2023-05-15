@@ -1,0 +1,31 @@
+import platform
+
+def is_running_in_virtual_machine():
+    # Technique 1: Check the system platform
+    if platform.system() == 'Linux':
+        with open('/proc/1/status', 'r') as f:
+            if 'sevirt' in f.read():
+                return True
+
+    # Technique 2: Check CPUID hypervisor bit
+    with open('/proc/cpuinfo', 'r') as f:
+        if 'hypervisor' in f.read():
+            return True
+
+    # Technique 3: Check MAC address prefix
+    with open('/sys/class/net/eth0/address', 'r') as f:
+        mac_address = f.read().strip()
+        if mac_address.startswith('00:0C:29') or mac_address.startswith('00:50:56'):
+            return True
+
+    # Technique 4: Check for virtualization-specific files
+    virtualization_files = ['/proc/vmware', '/proc/xen', '/proc/qemu']
+    if any(os.path.exists(file) for file in virtualization_files):
+        return True
+
+    return False
+
+if is_running_in_virtual_machine():
+    print("Running in a virtual machine!")
+else:
+    print("Not running in a virtual machine.")
