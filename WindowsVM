@@ -1,0 +1,21 @@
+import wmi
+
+def is_running_in_virtual_machine():
+    c = wmi.WMI()
+
+    # Check Win32_ComputerSystem class for virtualization-related properties
+    computer_system = c.Win32_ComputerSystem()[0]
+    if 'VMware' in computer_system.Manufacturer or 'VirtualBox' in computer_system.Manufacturer:
+        return True
+
+    # Check Win32_BaseBoard class for virtualization-related properties
+    base_board = c.Win32_BaseBoard()[0]
+    if 'Virtual' in base_board.Product or 'VM' in base_board.Product or 'Hypervisor' in base_board.Product:
+        return True
+
+    return False
+
+if is_running_in_virtual_machine():
+    print("Running in a virtual machine!")
+else:
+    print("Not running in a virtual machine.")
